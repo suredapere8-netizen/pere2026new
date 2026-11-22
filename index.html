@@ -840,6 +840,26 @@ const MISSIONS=[
  {map:'frostline',code:'M01',name:'Cold Open',tod:9.5,boss:'butcher',brief:'The Frostline relay above the fjord is the northern anchor of the Meridian network. Break the garrison, hold the uplink while Wrench cuts it loose. Expect The Butcher.'},
  {map:'barcelona',code:'M02',name:'Lights Out',tod:23,boss:'butcher',shadows:1,brief:'Barcelona has been dark for nine days. The Meridian control station sits under the cathedral square. Shadows hunt at night with thermal camo. Watch for heat shimmer.'},
  {map:'dust',code:'M03',name:'Zero Hour',tod:16.5,boss:'rein',brief:'Dust Valley holds the master control station. Commander Sasha Rein is on site. Take the station and you decide what happens to the network.'},
+ {map:'canyon',code:'M04',type:'survive',secs:150,name:'Red Rock',tod:16,brief:'Una patrulla de MERIDIAN os ha rodeado en el cañón. Aguanta hasta que llegue el helicóptero de extracción.'},
+ {map:'alpine',code:'M05',type:'hunt',n:10,name:'Silent Snow',tod:22.5,shadows:1,brief:'Un escuadrón de Sombras con camuflaje térmico se esconde en el pueblo. Caza a todos antes de que escapen.'},
+ {map:'refinery',code:'M06',type:'defend',name:'Black Gold',tod:14,brief:'Wrench tiene que cortar el control de la refinería desde la estación. Defiende la zona mientras trabaja.'},
+ {map:'harbor',code:'M07',type:'elim',n:30,name:'Dockside',tod:17,brief:'MERIDIAN está descargando armas en el puerto. Elimina a todos los enemigos de la terminal.'},
+ {map:'oldtown',code:'M08',type:'boss',boss:'butcher',name:'Iron Bell',tod:11,brief:'El Carnicero se ha atrincherado en el casco antiguo con su guardia. Acaba con él.'},
+ {map:'jungle',code:'M09',type:'uplink',name:'Green Hell',tod:7,brief:'El puesto de la selva transmite la posición de nuestras tropas. Limpia el campamento y toma la estación.'},
+ {map:'airfield',code:'M10',type:'survive',secs:180,name:'Runway Zero',tod:9,brief:'Tu avión ha caído en el aeródromo enemigo. Resiste tres minutos hasta que llegue el rescate.'},
+ {map:'suburb',code:'M11',type:'elim',n:34,name:'Quiet Street',tod:16,brief:'MERIDIAN ha ocupado el barrio. Limpia casa por casa sin dejar a nadie.'},
+ {map:'volcano',code:'M12',type:'defend',name:'Ash Fall',tod:17,brief:'La estación del cráter controla los satélites del norte. Mantén la zona mientras Wrench la hackea.'},
+ {map:'mine',code:'M13',type:'hunt',n:12,name:'Deep Copper',tod:14,shadows:1,brief:'Sombras en los túneles de la mina. Encuéntralas y elimínalas una por una.'},
+ {map:'swamp',code:'M14',type:'survive',secs:160,name:'Swamp Rats',tod:8,brief:'Estás atrapado en el pantano y la niebla no deja ver. Aguanta hasta la extracción.'},
+ {map:'ruins',code:'M15',type:'boss',boss:'rein',name:'Ghost Capital',tod:15,brief:'Sasha Rein ha vuelto y dirige la defensa de la ciudad en ruinas. Esta vez no escapa.'},
+ {map:'icebase',code:'M16',type:'uplink',name:'White Out',tod:11,brief:'La base polar es el último repetidor del sur. Rompe la guarnición y toma la estación.'},
+ {map:'farm',code:'M17',type:'elim',n:32,name:'Harvest Moon',tod:20.5,brief:'De noche, MERIDIAN usa la granja como depósito. Elimina a todos antes del amanecer.'},
+ {map:'castle',code:'M18',type:'defend',name:'Last Keep',tod:10,brief:'El castillo esconde una estación de mando. Defiéndela hasta que Wrench la apague.'},
+ {map:'railyard',code:'M19',type:'boss',boss:'butcher',name:'Freight Line',tod:13,brief:'El Carnicero escolta un tren de armas en la estación de mercancías. Detenlo.'},
+ {map:'quarry',code:'M20',type:'survive',secs:200,name:'Stone Cold',tod:13,brief:'Emboscada en la cantera. Resiste más de tres minutos contra oleadas sin fin.'},
+ {map:'coast',code:'M21',type:'hunt',n:12,name:'Lighthouse',tod:21.5,shadows:1,brief:'Las Sombras usan el faro para guiar sus barcos. Caza a todas en la oscuridad.'},
+ {map:'bridge',code:'M22',type:'uplink',name:'Crossing',tod:9,brief:'El puente es el único paso del río. Limpia las dos orillas y toma la estación de control.'},
+ {map:'motel',code:'M23',type:'boss',boss:'rein',name:'End of the Road',tod:17,brief:'Rein huye por la Ruta 66 y se ha refugiado en el motel. Última misión: acaba con ella.'},
 ];
 const DIFFS={kids:{name:'Kids',acc:.35,dmg:.15,xp:.8,hp:1,str:0,rof:.8},recruit:{name:'Recruit',acc:.75,dmg:.4,xp:.8,hp:1.15,str:.3,rof:.95},veteran:{name:'Veteran',acc:1.3,dmg:.7,xp:1,hp:1.45,str:.8,rof:1.15},zero:{name:'Zero Hour',acc:1.8,dmg:1.1,xp:1.5,hp:1.8,str:1,rof:1.35}};
 const TODS={dawn:{name:'Dawn',t:6.2},noon:{name:'Noon',t:12.5},dusk:{name:'Dusk',t:18.2},night:{name:'Night',t:23},auto:{name:'Mission',t:null}};
@@ -3650,6 +3670,7 @@ function updateMission(dt){
     if(engGGTick())return;if(objTick(dt))return;if(S.scoreI>=40||S.scoreM>=40||S.matchT>=600){endMatch(S.scoreI>S.scoreM);return;}
     setObj('Team Deathmatch · first to 40',S.map===S.map?MAPS[S.map].name:'');return;
   }
+  if(opsTick(dt))return;
   const alive=aliveFoes();
   if(S.phase==='assault'){
     W.spawnCd-=dt;if(W.toSpawn>0&&alive<W.max&&W.spawnCd<=0){const g=Math.min(W.toSpawn,randi(1,3));for(let i=0;i<g;i++)spawnFoe(waveKind());W.toSpawn-=g;W.spawnCd=rand(2,4);}
@@ -5262,7 +5283,7 @@ function startMatch(){
   G.slots=[makeSlot(WEAPONS[LO.primary],true),makeSlot(SECONDARY[LO.secondary],false)];G.cur=0;G.reloadT=0;G.switchT=0;G.adsT=0;G.nades=2;G.tacs=2;G.streaks=[];G.burstLeft=0;G.recoilAcc=0;buildVM();
   // squad
   if(!tut&&!pvp&&!(CFG.mode==='skirmish'&&CFG.rule==='gg'))SQUAD.forEach((s,i)=>spawnActor('iron',s.kind,sp[0]-6+i*3,sp[1]+3,s));
-  if(camp){S.uplinkPos=V3(S.spawns.uplink[0],0,S.spawns.uplink[1]);W.bossSpawned=false;startWave(1);}
+  if(camp){S.uplinkPos=V3(S.spawns.uplink[0],0,S.spawns.uplink[1]);W.bossSpawned=false;if(!opsBegin())startWave(1);}
   else if(tut){S.phase='tutorial';}else if(pvp){S.phase='pvp';}else{S.phase='tdm';const gg0=CFG.mode==='skirmish'&&CFG.rule==='gg',kinds=gg0?['trooper','trooper','gunner','marksman','trooper','shadow','trooper','gunner']:['trooper','trooper','gunner','marksman','trooper','shadow'];kinds.forEach((k,i)=>{const p=S.spawns.mer[i%S.spawns.mer.length];spawnActor('meridian',k,p[0]+rand(-3,3),p[1]+rand(-2,2)).respawnT=undefined;});for(const a of actors)a.isBot=true;objStart();if(gg0){S.gg={lv:0,deaths:0,done:0,kills:0,time:0};engGGApply();say('Overlord','',"Gun game. Every kill gives you a new weapon. Finish with the knife.",true);}else say('Overlord','',S.obj&&S.obj.rule==='dom'?"Domination. Capture and hold Alpha, Bravo and Charlie.":S.obj&&S.obj.rule==='kc'?"Kill confirmed. Collect the tags to score.":S.obj&&S.obj.rule==='hp'?"Hardpoint. Hold the marked zone.":"Six on six. First team to forty takes the sector.",true);}
   updateSky();startAmbience();updateHUDStreaks();
   $('#menu').hidden=true;$('#end').hidden=true;$('#hud').hidden=false;$('#score').hidden=S.mode!=='skirmish'&&S.mode!=='pvp';$('#bossbar').style.display='none';$('#radio').innerHTML='';$('#feedwrap').innerHTML='';
@@ -5287,7 +5308,7 @@ function endMatch(win){
   const after=levelOf(PROF.xp);saveAll();
   const acc=ST.shots?Math.round(ST.hits/ST.shots*100):0;
   $('#endEye').textContent=tut?'Training · '+MAPS[S.map].name:camp?S.mission.code+' · '+S.mission.name:'Skirmish · '+MAPS[S.map].name;
-  $('#endTitle').textContent=tut?(win?'Training complete':'Training ended'):win?(camp?'Station secured':'Sector taken'):(camp?'Mission failed':'Sector lost');
+  $('#endTitle').textContent=tut?(win?'Training complete':'Training ended'):win?(camp?({survive:'Extraction complete',elim:'Area cleared',hunt:'Shadows eliminated',boss:'Target eliminated'}[S.mission&&S.mission.type]||'Station secured'):'Sector taken'):(camp?'Mission failed':'Sector lost');
   let txt=tut?(win?'You can move, aim, use your optic, mark enemies, throw grenades and call a killstreak. Your first run earns a one-time 300 XP bonus.':'Training ended early. You can repeat it any time from the Deploy tab.'):win?(camp?'The uplink is back in friendly hands.':'Task Force IRON '+S.scoreI+', Meridian '+S.scoreM+'.'):(camp?'Task Force IRON pulled back. Regroup and go again.':'Meridian '+S.scoreM+', Task Force IRON '+S.scoreI+'.');
   if(after>before)txt+=' Promoted to '+RANKS[Math.min(after-1,RANKS.length-1)]+' (rank '+after+').';
   $('#endText').textContent=txt;
@@ -5295,9 +5316,9 @@ function endMatch(win){
   if(S.gg)engGGEnd(win);if(S.obj&&S.mode==='skirmish')objEnd(win);
   const btns=$('#endBtns');btns.innerHTML='';
   const mk=(t,cls,fn)=>{const b=document.createElement('button');b.className=cls;b.textContent=t;b.onclick=fn;btns.appendChild(b);};
-  if(win&&camp&&CFG.mission===2){mk('Destroy the network','go',()=>ending('destroy'));mk('Take control of it','ghost',()=>ending('control'));$('#endText').textContent+=' Rein is dead. Wrench holds the master key to every Meridian satellite. Your call.';}
+  if(win&&camp&&CFG.mission===2){mk('Destroy the network','go',()=>ending('destroy'));mk('Take control of it','ghost',()=>ending('control'));mk('Operaciones ▶ M04','ghost',()=>{CFG.mission=3;saveAll();startMatch();});$('#endText').textContent+=' Rein is dead. Wrench holds the master key to every Meridian satellite. Your call.';}
   else{
-    if(win&&camp&&CFG.mission<2)mk('Next mission','go',()=>{CFG.mission++;saveAll();startMatch();});
+    if(win&&camp&&CFG.mission<MISSIONS.length-1&&CFG.mission!==2)mk('Next mission','go',()=>{CFG.mission++;saveAll();startMatch();});
     if(tut&&win)mk('Start campaign','go',()=>{CFG.mode='campaign';CFG.mission=0;saveAll();startMatch();});
     if(tut&&win)mk('Play Battle Royale','go',()=>{CFG.mode='br';saveAll();startMatch();});
     mk('▶ OTRA VEZ','go rematch',()=>startMatch());mk('Menú','ghost',showMenu);
@@ -8541,7 +8562,7 @@ function refreshMenu(){
   $('#rankName').textContent='Rank '+lvl+' · '+RANKS[Math.min(lvl-1,RANKS.length-1)];$('#xpText').textContent=PROF.xp+' XP · '+PROF.credits+' CR';$('#xpfill').style.width=((PROF.xp-cur)/(nxt-cur)*100)+'%';
   seg('g-mode',{tutorial:{name:'Training'},campaign:{name:'Campaign'},skirmish:{name:'Skirmish 6v6'},br:{name:'Battle Royale'}},()=>CFG.mode,k=>{CFG.mode=k;previewMap();},{sub:v=>v.name==='Training'?(PROF.tutorialDone?'Done · replay any time':'Start here · about 5 min'):v.name==='Campaign'?'Story with your squad':v.name==='Battle Royale'?'100 players · drop, loot, build, survive':'Duelo · Dominio · Baja confirmada · Punto caliente'});
   $('#campBox').hidden=CFG.mode!=='campaign';$('#mapBox').hidden=CFG.mode!=='skirmish';$('#brBox').hidden=CFG.mode!=='br';
-  cards('g-mission',MISSIONS.map((m,i)=>({key:i,code:m.code+' · '+MAPS[m.map].grid,title:m.name,sub:MAPS[m.map].name+', '+MAPS[m.map].loc,tag:m.code,img:MAPPIC[m.map],locked:i>PROF.campaign})),()=>CFG.mission,k=>{CFG.mission=k;previewMap();});
+  cards('g-mission',MISSIONS.map((m,i)=>({key:i,code:m.code+' · '+(m.type?OPSN[m.type]:'Historia'),title:m.name,sub:MAPS[m.map].name+', '+MAPS[m.map].loc,tag:m.code,img:MAPPIC[m.map],locked:i>PROF.campaign})),()=>CFG.mission,k=>{CFG.mission=k;previewMap();});
   cards('g-map',Object.entries(MAPS).filter(([k])=>k!=='island').map(([k,m])=>({key:k,code:m.size.toUpperCase()+' · '+m.grid,title:m.name,sub:m.desc,tag:m.size.toUpperCase(),img:MAPPIC[k]})),()=>CFG.map,k=>{CFG.map=k;previewMap();});
   const mk=modeMap(),M=MAPS[mk];
   const br=$('#brief');br.innerHTML='<div class="eyebrow"></div><div></div><div class="note" style="margin-top:6px"></div>';
@@ -9237,6 +9258,40 @@ function baTick(dt){
   const h=$('#brBuildHint');if(h){h.style.display=BR.build?'block':'none';if(BR.build)h.textContent='CONSTRUIR · 1 Muro · 2 Suelo · 3 Rampa · 4 Techo · Q Material ('+BRMATS[BR.mat].n+') · F Editar muro · clic para poner · B salir';}
   const tip=$('#baTip');if(tip){tip.textContent=BR.build?'':BR.hold==='pick'?'Pico · clic para golpear · 1/2 armas':'B construir · 3 pico';}
   const mg=$('#brMsg');if(mg&&BR.msgT&&T>BR.msgT){mg.style.opacity=0;BR.msgT=0;}
+}
+
+
+// ---------- br49: one campaign operation on every map, with six kinds of objective ----------
+const OPSN={uplink:'Tomar la estación',survive:'Sobrevivir',elim:'Eliminar a todos',boss:'Cazar al jefe',defend:'Defender la estación',hunt:'Cazar Sombras'};
+function opsBegin(){
+  const m=S.mission;W.max=9;if(!m||!m.type||m.type==='uplink')return false;W.n=1;W.spawnCd=2;W.opsT=0;
+  if(m.type==='survive'){S.phase='survive';W.surv=m.secs||150;W.max=8;say('Overlord','',"You're surrounded. Hold on, extraction is on the way.",true);}
+  else if(m.type==='elim'){S.phase='elim';W.toSpawn=Math.round((m.n||30)*(S.diff===DIFFS.zero?1.2:1));W.max=9;say('Overlord','',"Clear the area. Leave no one standing.",true);}
+  else if(m.type==='hunt'){S.phase='hunt';W.toSpawn=m.n||10;W.max=6;say('Ghost','',"Shadows in the area. Watch for heat shimmer.",true);}
+  else if(m.type==='boss'){S.phase='boss';W.toSpawn=8;W.max=6;W.bossT=6;say('Overlord','',m.boss==='rein'?"Rein is here. End this.":"The Butcher is dug in. Take him down.",true);}
+  else if(m.type==='defend'){S.phase='uplink';S.uplinkProg=0;W.spawnCd=3;say('Wrench','',"I'm on the station. Keep them off me.",true);}
+  return true;
+}
+function opsWin(xp,txt){addXP(xp,txt);S.phase='done';say('Overlord','',"Objective complete. Good work, IRON.",true);timers.push({t:T+3,fn:()=>endMatch(true)});}
+function opsTick(dt){
+  const m=S.mission;if(!m||!m.type)return false;const ph=S.phase,alive=aliveFoes();
+  if(ph==='done')return true;
+  if(ph==='survive'){
+    W.surv-=dt;W.spawnCd-=dt;const k=1-W.surv/(m.secs||150);
+    if(alive<W.max+Math.floor(k*4)&&W.spawnCd<=0){const g=randi(1,2);for(let i=0;i<g;i++)spawnFoe(Math.random()<.12*k?'gunner':waveKind());W.spawnCd=rand(1.6,3.2)-k;}
+    const s=Math.max(0,Math.ceil(W.surv));setObj('Sobrevive hasta la extracción',Math.floor(s/60)+':'+String(s%60).padStart(2,'0'),1-W.surv/(m.secs||150));
+    if(W.surv<=0)opsWin(1400,'Survived');return true;}
+  if(ph==='elim'||ph==='hunt'){
+    W.spawnCd-=dt;if(W.toSpawn>0&&alive<W.max&&W.spawnCd<=0){const g=Math.min(W.toSpawn,randi(1,3));for(let i=0;i<g;i++)spawnFoe(ph==='hunt'?(Math.random()<.75?'shadow':'marksman'):waveKind());W.toSpawn-=g;W.spawnCd=rand(2,4);}
+    const left=W.toSpawn+alive;setObj(ph==='hunt'?'Caza a todas las Sombras':'Elimina a todos los enemigos',left+' restantes',1-left/Math.max(1,m.n||30));
+    if(W.toSpawn<=0&&alive===0)opsWin(1300,ph==='hunt'?'Shadows hunted':'Area cleared');return true;}
+  if(ph==='boss'){
+    W.bossT-=dt;if(!W.bossSpawned&&W.bossT<=0){W.bossSpawned=true;spawnFoe(m.boss||'butcher');if(m.boss==='rein'){spawnFoe('shadow');spawnFoe('shadow');}}
+    W.spawnCd-=dt;if(W.toSpawn>0&&alive<W.max&&W.spawnCd<=0){spawnFoe(waveKind());W.toSpawn--;W.spawnCd=rand(3,5);}
+    const b=actors.find(a=>a.kind===(m.boss||'butcher')&&!a.dead);
+    setObj(m.boss==='rein'?'Elimina a Sasha Rein':'Elimina al Carnicero',b?'Objetivo en la zona':'Llega en '+Math.max(0,Math.ceil(W.bossT))+' s');
+    if(W.bossSpawned&&!b&&!actors.some(a=>a.kind===(m.boss||'butcher')&&!a.dead))opsWin(1600,'Boss down');return true;}
+  return false;
 }
 
 // ======================= BOOT =======================
